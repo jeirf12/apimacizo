@@ -6,9 +6,9 @@ class ControladorSesion extends Controlador {
     private $sesion;
 
     public function __construct() {
-        $this->conexion =  new clsConexion();
+        $this->getConnection();
         $this->sesion = new clsSesion($this->conexion);
-        $this->existeSesion = false;
+        $this->validaSesion();
     }
 
     public function index() {
@@ -20,13 +20,14 @@ class ControladorSesion extends Controlador {
     }
     
     public function iniciarSesion() {
-        if(!$this->isSesion()) {
+        if(!$this->existeSesion) {
             $this->nombrePagina = 'Iniciar Sesión';
             $isForm = false;
             setcookie('msg', '', time() - 60);
             setcookie('act', '', time() - 60);
             $this->message = isset($_COOKIE['msg']) ? $_COOKIE['msg'] : $this->message;
             $this->action = isset($_COOKIE['act']) ? $_COOKIE['act'] : $this->action;
+            $this->existeSesion = $this->isSesion();
             $this->vistaEnvoltura = 'Vista/componentes/paginas/iniciarsesion.php';
             require_once 'Vista/componentes/paginas/envoltura.php';
         } else {
@@ -35,7 +36,7 @@ class ControladorSesion extends Controlador {
     }
     
     public function existeUsuario() {
-        if(!$this->isSesion()) {
+        if(!$this->existeSesion) {
             $correo = isset($_REQUEST['correo']) ? $_REQUEST['correo'] : " ";
             $clave = isset($_REQUEST['contrasenia']) ? $_REQUEST['contrasenia'] : " ";
             if (empty($correo) && empty($clave)) {
@@ -45,7 +46,6 @@ class ControladorSesion extends Controlador {
             } else {
                 $this->usuario = $this->sesion->existeUsuario($correo, $clave);
                 if($this->usuario->__get('rol')=='admin' || $this->usuario->__get('rol') == 'noadmin') {
-                    $this->existeSesion = $this->isSesion();
                     $this->message = 'Inicio sesión correctamente!';
                     $this->action = 'success';
                     setcookie('msg', $this->message);
@@ -60,13 +60,12 @@ class ControladorSesion extends Controlador {
                 }
             }
         } else {
-            $this->validaSesion();
             $this->index();
         }
     }
     
     public function cerrarSesion() {
-        if(!$this->isSesion()) {
+        if(!$this->existeSesion) {
             $this->index();
             return;
         }
@@ -81,6 +80,7 @@ class ControladorSesion extends Controlador {
             unset($_SESSION['access_token']);
         }
         $this->sesion->cerrarSesion();
+        $this->existeSesion = $this->isSesion();
         $this->message = 'Cerró sesión correctamente!';
         $this->action = 'success';
         setcookie('msg', $this->message);
@@ -89,7 +89,7 @@ class ControladorSesion extends Controlador {
     }
 
     public function registrarUsuario() {
-        if(!$this->isSesion()) {
+        if(!$this->existeSesion) {
             $this->nombrePagina = 'Registrar Usuario';
             $this->vistaEnvoltura = 'Vista/componentes/paginas/registrarusuario.php';
             require 'Vista/componentes/paginas/envoltura.php';
@@ -99,7 +99,7 @@ class ControladorSesion extends Controlador {
     }
 
     public function registroUsuario() {
-        if($this->isSesion()) {
+        if($this->existeSesion) {
             $this->index();
             return;
         }
@@ -133,7 +133,7 @@ class ControladorSesion extends Controlador {
     }
 
     public function google() {
-        if($this->isSesion()) {
+        if($this->existeSesion) {
             $this->index();
             return;
         }
@@ -148,7 +148,7 @@ class ControladorSesion extends Controlador {
     }
 
     public function apiGoogle() {
-        if($this->isSesion()) {
+        if($this->existeSesion) {
             $this->index();
             return;
         }
@@ -198,7 +198,6 @@ class ControladorSesion extends Controlador {
     }
 
     public function apiContacto() {
-        $this->validaSesion();
         if(isset($this->usuario) && $this->usuario->__get('rol') == 'admin') {
             $this->index();
             return;
@@ -223,7 +222,6 @@ class ControladorSesion extends Controlador {
 
     public function inicio() {
         $this->nombrePagina = 'Inicio';
-        $this->validaSesion();
         setcookie('msg', '', time() - 60);
         setcookie('act', '', time() - 60);
         $this->message = isset($_COOKIE['msg']) ? $_COOKIE['msg'] : $this->message;
@@ -233,20 +231,17 @@ class ControladorSesion extends Controlador {
     }
 
     public function contacto() {
-        $this->validaSesion();
         if(isset($this->usuario) && $this->usuario->__get('rol') == 'admin') {
             $this->index();
             return;
         }
         $this->nombrePagina = 'Contacto';
-        $this->validaSesion();
         $this->vistaEnvoltura = 'Vista/componentes/paginas/contacto.php';
         require 'Vista/componentes/paginas/envoltura.php';
     }
 
     public function sobreNosotros() {
         $this->nombrePagina = 'Sobre Nosotros';
-        $this->validaSesion();
         $this->vistaEnvoltura = 'Vista/componentes/paginas/sobreNosotros.php';
         require 'Vista/componentes/paginas/envoltura.php';
     }

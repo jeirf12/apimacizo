@@ -10,9 +10,9 @@ class ControladorProducto extends Controlador {
     private $categorias;
 
     public function __construct() {
-        $this->conexion = new clsConexion();
+        $this->getConnection();
         $this->crud = new clsProductoCRUD($this->conexion);
-        $this->existeSesion = false;
+        $this->validaSesion();
     }
 
     public function index() {
@@ -27,7 +27,6 @@ class ControladorProducto extends Controlador {
         $this->nombrePagina = 'Listado Productos';
         $this->productos = $this->crud->listarProductos();
         $this->categorias = $this->crud->obtenerCategoriasProductos();
-        $this->validaSesion();
         setcookie('msg', '', time() - 60);
         setcookie('act', '', time() - 60);
         $this->message = (isset($_COOKIE['msg'])) ? $_COOKIE['msg'] : $this->message;
@@ -46,7 +45,6 @@ class ControladorProducto extends Controlador {
         $this->nombrePagina = 'Buscar Productos';
         $this->productos = $this->crud->buscarProductoPorPalabras($_REQUEST['word_search']);
         $this->categorias = $this->crud->obtenerCategoriasProductos();
-        $this->validaSesion();
         setcookie('msg', '', time() - 60);
         setcookie('act', '', time() - 60);
         $this->message = (isset($_COOKIE['msg'])) ? $_COOKIE['msg'] : $this->message;
@@ -64,7 +62,6 @@ class ControladorProducto extends Controlador {
     public function crearEditar() {
         $this->nombrePagina = 'Registrar Producto';
         $isForm = false;
-        $this->validaSesion();
         if($this->existeSesion && $this->usuario->__get('rol') == 'admin') {
             if(isset($_REQUEST['proid'])) {
                 $this->nombrePagina = 'Editar Producto';
@@ -85,7 +82,6 @@ class ControladorProducto extends Controlador {
     }
     
     public function crear() {
-        $this->validaSesion();
         if($this->existeSesion && $this->usuario->__get('rol') == 'admin') {
             $resultado = false;
             $auxProducto = new clsProducto();
@@ -137,7 +133,6 @@ class ControladorProducto extends Controlador {
     }
     
     public function eliminar() {
-        $this->validaSesion();
         if($this->existeSesion && $this->usuario->__get('rol') == 'admin') {
             $this->crud->eliminarProducto($_REQUEST['id']);
             $this->message = 'El producto fue eliminado con exito.';

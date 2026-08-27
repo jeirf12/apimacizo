@@ -17,10 +17,10 @@
           <li><a class="nav-inicio">Inicio</a></li>
           <li><a class="nav-about">Sobre Nosotros</a></li>
           <li><a class="nav-productos">Productos</a></li>
-          <?php if((isset($this->existeSesion) && !$this->existeSesion) || $this->usuario->__get('rol') == 'noadmin'): ?>
+          <?php if(!$this->existeSesion || $this->usuario->__get('rol') == 'noadmin'): ?>
             <li><a class="nav-contacto">Contacto</a></li>
           <?php endif; ?>
-          <?php if(isset($this->existeSesion) && $this->existeSesion): ?>
+          <?php if($this->existeSesion): ?>
           <li>
           <div class="info-user">
             <div class="dropdown" id="btnOpenDropdown">

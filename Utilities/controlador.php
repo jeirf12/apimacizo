@@ -2,7 +2,7 @@
 require_once 'Modelo/clsConexion.php'; 
 require_once 'Modelo/clsUsuario.php'; 
 
-abstract class Controlador{
+abstract class Controlador {
     protected $conexion;
     protected $usuario;
     protected $nombrePagina;
@@ -11,11 +11,15 @@ abstract class Controlador{
     protected $action;
     protected $vistaEnvoltura;
     
-    public function isSesion(){
+    public function isSesion() {
         return isset($_SESSION['nombre']);
     }
 
-    public function validaSesion(){
+    public function validaSesion() {
+        if(!empty($this->existeSesion)) {
+            return;
+        }
+
         $this->existeSesion = $this->isSesion();
         if($this->existeSesion){
             $this->usuario = new clsUsuario();
@@ -25,7 +29,7 @@ abstract class Controlador{
         }
     }
 
-    public function validaImagen(){
+    public function validaImagen() {
         $data_img = '';
         if(!isset($_FILES['imagen']) && !$_FILES['imagen']['error'] == UPLOAD_ERR_OK) { 
             return $data_img; 
@@ -39,13 +43,20 @@ abstract class Controlador{
         return $data_img;
     }
 
-    public function hasConnection(){
+    public function hasConnection() {
         $request = curl_init('https://www.google.com');
         curl_setopt($request, CURLOPT_RETURNTRANSFER, TRUE);
         curl_exec($request);
         $result = curl_getinfo($request, CURLINFO_HTTP_CODE);
         curl_close($request);
         return ($result >= 200 && $result < 300);
+    }
+
+    public function getConnection() {
+        if(!empty($this->conexion))
+            return;
+
+        $this->conexion = new clsConexion();
     }
 }
 ?>

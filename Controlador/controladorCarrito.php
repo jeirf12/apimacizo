@@ -7,13 +7,12 @@ class ControladorCarrito extends Controlador {
     private $crud;
 
     public function __construct() {
-        $this->conexion =  new clsConexion();
+        $this->getConnection();
         $this->crud = new clsCarritoCRUD($this->conexion);
-        $this->existeSesion = false;
+        $this->validaSesion();
     }
 
     public function listar() {
-        $this->validaSesion();
         if($this->existeSesion) {
            $compras = $this->crud->obtenerProductosCarrito($this->usuario->__get('id'));
            $this->nombrePagina = 'Lista de Compras';
@@ -30,8 +29,7 @@ class ControladorCarrito extends Controlador {
     }
        
     public function crearEditar() {
-        if($this->isSesion()) {
-            $this->validaSesion();
+        if($this->existeSesion) {
             $resultado = false;
             $auxOp = '';
             $cant = 0;
@@ -79,7 +77,6 @@ class ControladorCarrito extends Controlador {
     }
     
     public function eliminar() {
-        $this->validaSesion();
         $auxCarrito = $this->obtenerInfoVistaCarrito();
         if($this->existeSesion) {
             if ($auxCarrito->__get('usuid') == $this->usuario->__get('id') && $this->usuario->__get('rol') == 'noadmin') {
