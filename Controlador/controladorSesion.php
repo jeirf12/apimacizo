@@ -45,6 +45,7 @@ class ControladorSesion extends Controlador {
                 $this->iniciarSesion();
             } else {
                 $this->usuario = $this->sesion->existeUsuario($correo, $clave);
+                $this->existeSesion = $this->isSesion();
                 if($this->usuario->__get('rol')=='admin' || $this->usuario->__get('rol') == 'noadmin') {
                     $this->message = 'Inicio sesión correctamente!';
                     $this->action = 'success';
@@ -79,6 +80,7 @@ class ControladorSesion extends Controlador {
             $google_client->revokeToken();
             unset($_SESSION['access_token']);
         }
+        $this->usuario = null;
         $this->sesion->cerrarSesion();
         $this->existeSesion = $this->isSesion();
         $this->message = 'Cerró sesión correctamente!';
