@@ -1,5 +1,5 @@
 <header class="header">
-  <div class="logo"><a href="/"><img src="Vista/css/logo.png" alt="logo" height="70"></a></div>
+<div class="logo"><a href="?c=sesion&a=inicio"><img src="Vista/css/logo.png" alt="logo" height="70"></a></div>
   <div class="bar-search">
     <form id="frm-busqueda" class="frm-busqueda" action="?c=producto&a=buscarProducto" method="POST">
         <div class="grupo-busqueda">
